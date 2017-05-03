@@ -1,9 +1,20 @@
 <?php
+session_start();
+if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true) {
+    
+} else {
+    echo "<script language=\"JavaScript\">\n";
+        echo "alert('Please log in first to see this page');\n";
+        echo "window.location='index.php'";
+        echo "</script>";
+}
+  
 
 if(isset($_POST["submit"]))
 {
+	// echo $_SESSION['username'];
 	// echo date('Y-m-d', strtotime(`1-Feb-2016`));
-	// return;sDATE
+	// return;
 	/*Define column names and their type*/
 	$hardCodedColumnNamesTypes = array(
 	'APPLICATION NUMBER' =>	'int(5)',
@@ -57,19 +68,20 @@ if(isset($_POST["submit"]))
 
 	define('DB_SERVER', 'localhost');
 	define('DB_USERNAME', 'root');
-	define('DB_PASSWORD', 'rk3095@@@@');
-	define('DB_DATABASE', 'test2');
+	define('DB_PASSWORD', 'samantha');
+	define('DB_DATABASE', 'mtech_list');
 	$db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
 
 	$filename=$_FILES["file"]["name"];
 	$ext=substr($filename,strrpos($filename,"."),(strlen($filename)-strrpos($filename,".")));
 	$filen = substr($filename, 0, -4); //filename without ".csv"
-
+	$myUsername = explode('@', $_SESSION['username']);
+	$filen = $myUsername[0]."$".$filen;
 	//we check,file must be have csv extention
 	if($ext==".csv")
 	{
 		/*-----------CSV File processing -----------*/
-		$filePath = "/home/rahul/Desktop".'/'.$filename;
+		$filePath = "/home/tharun/Desktop".'/'.$filename;
 		// $filePath = $_SERVER['PWD'].'/'.$filename;
 
 		$file = fopen($filePath, 'r');
@@ -116,8 +128,11 @@ if(isset($_POST["submit"]))
 
 		$flagName = 0;
 		$flagValidUpto = 0;
+		$tempCount = -1;
+		$tempCount2 = -1;
 		foreach ($columnNameArray as $key => $value)
 		{
+			$value = trim($value);
 			$valueT = explode('$', $value);
 			// echo $value[0];
 
@@ -129,11 +144,13 @@ if(isset($_POST["submit"]))
 				$columnNameArrayMysql = $columnNameArrayMysql . " `". $value . "` ". $hardCodedColumnNamesTypes[$valueT[0]];
 				if ($value == 'NAME') 
 				{
+					$tempCount2 = $key;
 					$flagName = 1;
 					$columnNameString = $columnNameString . '@var1';
 				}
 				elseif ($value == 'VALID UPTO') 
 				{
+					$tempCount = $key;
 					$flagValidUpto = 1;
 					$columnNameString = $columnNameString . '@var2';
 				}
@@ -147,11 +164,14 @@ if(isset($_POST["submit"]))
 				$columnNameArrayMysql = $columnNameArrayMysql . ", `". $value . "` ". $hardCodedColumnNamesTypes[$valueT[0]];
 				if ($value == 'NAME') 
 				{
+					$tempCount2 = $key;
 					$flagName = 1;
 					$columnNameString = $columnNameString . ", ". '@var1';
+
 				} 
 				elseif ($value == 'VALID UPTO') 
 				{
+					$tempCount = $key;
 					$flagValidUpto = 1;
 					$columnNameString = $columnNameString . ", ". '@var2';
 				}
@@ -166,8 +186,43 @@ if(isset($_POST["submit"]))
 			// echo $value, " ", $hardCodedColumnNamesTypes[$value], "\n";
 		}
 
+		// Check valid upto date format
+		$tempRowValues = fgetcsv($file);
+		// $validUptoDate;
+		foreach ($tempRowValues as $key => $value)
+		{
+			if($key == $tempCount)
+			{
+				$validUptoDate = $value;
+			}
+			if($key == $tempCount2)
+			{
+				$c = substr($value, 0, 2);
+				if($c=="Ms" || $c=="Mr")
+				{
+					$cnum = 4;
+				}
+				else
+				{
+					$cnum = 1;
+				}
+			}
+		}
+
+		echo $validUptoDate;
+
+		if (DateTime::createFromFormat('Y-m-d', $validUptoDate) !== FALSE) {
+			// echo 'true';
+			$validUptoDateFormat = '%Y-%m-%d';
+		} 
+		else 
+		{
+			$validUptoDateFormat = '%d-%b-%Y';
+		}
+
+		// return;
 		// echo $columnNameArrayMysql;
-		echo $columnNameString;
+		// echo $columnNameString;
 
 		/*-----------Create MYSQL Table -----------*/
 		// CREATE TABLE pet (name VARCHAR(20), owner VARCHAR(20), species VARCHAR(20), sex CHAR(1), birth DATE, death DATE);
@@ -185,15 +240,15 @@ if(isset($_POST["submit"]))
 		}
 		elseif ($flagName == 1 && $flagValidUpto == 0) 
 		{
-			$q = "LOAD DATA LOCAL INFILE '{$filePath}' INTO TABLE `{$filen}` fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' ignore {$num} lines ({$columnNameString}) set `NAME` = substr(@var1, 4) ";
+			$q = "LOAD DATA LOCAL INFILE '{$filePath}' INTO TABLE `{$filen}` fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' ignore {$num} lines ({$columnNameString}) set `NAME` = substr(@var1, {$cnum}) ";
 		}
 		elseif ($flagName == 0 && $flagValidUpto == 1) 
 		{
-			$q = "LOAD DATA LOCAL INFILE '{$filePath}' INTO TABLE `{$filen}` fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' ignore {$num} lines ({$columnNameString}) set `VALID UPTO` = STR_TO_DATE(@var2, '%d-%b-%y')";
+			$q = "LOAD DATA LOCAL INFILE '{$filePath}' INTO TABLE `{$filen}` fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' ignore {$num} lines ({$columnNameString}) set `VALID UPTO` = STR_TO_DATE(@var2, '{$validUptoDateFormat}')";
 		}
 		else
 		{
-			$q = "LOAD DATA LOCAL INFILE '{$filePath}' INTO TABLE `{$filen}` fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' ignore {$num} lines ({$columnNameString}) set `NAME` = substr(@var1, 4), `VALID UPTO` = STR_TO_DATE(@var2, ''%d-%b-%Y' or '%Y-%m-%d'') ";
+			$q = "LOAD DATA LOCAL INFILE '{$filePath}' INTO TABLE `{$filen}` fields terminated by ',' OPTIONALLY ENCLOSED BY '\"' ignore {$num} lines ({$columnNameString}) set `NAME` = substr(@var1, {$cnum}), `VALID UPTO` = STR_TO_DATE(@var2, '{$validUptoDateFormat}')";
 		}
 		// %m/%d/%Y
 
@@ -204,6 +259,7 @@ if(isset($_POST["submit"]))
 		echo $result = mysqli_query($db,$q);
 		// LOAD DATA LOCAL INFILE '{$file}' INTO TABLE {$table}
 		// mysql_query($q, $db);
+		header("location:welcome.php?tn=".$filen."");
 	}
 	else {
 	    echo "Error: Please Upload only CSV File";

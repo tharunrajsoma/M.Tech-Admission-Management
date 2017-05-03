@@ -15,6 +15,10 @@
    $v='0000-00-00';
    $coln = array("APPLICATION NUMBER","NAME","BIRTH CATEGORY","DISABLE STATUS", "REGISTERED EMAIL ID", "PERCENTAGE OF MARKS$1", "PERCENTAGE OF GP$1",  "GATE SCORE", "GATE AIR", "VALID UPTO", "PROGRAM TYPE$1","PRIORITY$2","PROGRAM TYPE$2","PRIORITY$3", "PROGRAM TYPE", "PRIORITY$1", "GENDER", "MARITAL STATUS","DATE OF BIRTH","PLACE OF BIRTH","FATHER NAME","DISABLE DESCRIPTION","MOBILE NUMBER","DEGREE TYPE NAME$1","DEGREE NAME$1","INSTITUTE NAME$1","UNIVERSITY$1","SPECILIZATION$1","DIVISION$1","YEAR OF PASS$1","SECURED MARKS$1","TOTAL MARKS$1","SECURED GP$1","TOTAL GP$1","EXPERIENCE TYPE NAME","ORGANIZATION NAME","DESIGNITION","NATURE OF WORK","FROM DATE","TO DATE"," DURATION");
    //  ENTRY EXAM NAME REGISTRATION NUMBER EXAM YEAR SPECILAZATION DESCRIPTION PRIORITY  PROGRAM TYPE PRIORITY1  PRIORITY2 PROGRAM TYPE$2 PRIORITY3 REFERENCE TYPE NAME AMOUNT
+    if(!empty($_GET['tn']))
+    {
+       $tn = filter_input(INPUT_GET, 'tn', FILTER_SANITIZE_STRING);
+    }
     if(!empty($_GET['score1']))
     {
        $score1 = filter_input(INPUT_GET, 'score1', FILTER_VALIDATE_INT);
@@ -60,12 +64,12 @@
    {
       if($p0=='NULL')
       {
-        $sql2 = "SELECT * FROM `mtechapplist` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
+        $sql2 = "SELECT * FROM `$tn` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
     
       }
       else
       {
-        $sql2 = "SELECT * FROM `mtechapplist` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE`='$p0' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
+        $sql2 = "SELECT * FROM `$tn` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE`='$p0' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
 
       }
    }
@@ -73,12 +77,12 @@
    {
       if($p0=='NULL')
       {
-        $sql2 = "SELECT * FROM `mtechapplist` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$2`='$p2' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
+        $sql2 = "SELECT * FROM `$tn` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$2`='$p2' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
 
       }
       else
       {
-        $sql2 = "SELECT * FROM `mtechapplist` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$2`='$p2' and `PROGRAM TYPE`='$p0' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
+        $sql2 = "SELECT * FROM `$tn` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$2`='$p2' and `PROGRAM TYPE`='$p0' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
 
       }
 
@@ -90,12 +94,12 @@
    {
       if($p0=='NULL')
       {
-        $sql2 = "SELECT * FROM `mtechapplist` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$1`='$p1' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'"; 
+        $sql2 = "SELECT * FROM `$tn` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$1`='$p1' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'"; 
 
       }
       else
       {
-        $sql2 = "SELECT * FROM `mtechapplist` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$1`='$p1' and `PROGRAM TYPE`='$p0' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
+        $sql2 = "SELECT * FROM `$tn` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$1`='$p1' and `PROGRAM TYPE`='$p0' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
 
       }
    }
@@ -103,12 +107,12 @@
    {
       if($p0=='NULL')
       {
-        $sql2 = "SELECT * FROM `mtechapplist` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$1`='$p1' and `PROGRAM TYPE$2`='$p2' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
+        $sql2 = "SELECT * FROM `$tn` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$1`='$p1' and `PROGRAM TYPE$2`='$p2' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
 
       }
       else
       {
-        $sql2 = "SELECT * FROM `mtechapplist` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$1`='$p1' and `PROGRAM TYPE$2`='$p2' and `PROGRAM TYPE`='$p0' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
+        $sql2 = "SELECT * FROM `$tn` where `GATE SCORE` > $score1 and `GATE SCORE` < $score2 and `PROGRAM TYPE$1`='$p1' and `PROGRAM TYPE$2`='$p2' and `PROGRAM TYPE`='$p0' and `DISABLE STATUS`!='$d' and `VALID UPTO`>'$v'";
 
       }
 
@@ -119,20 +123,17 @@
 
 $result= mysqli_query($db,$sql2);
 
-$filename ="my_data_file_name.csv";
-header('Content-type: application/ms-excel');
-header('Content-Disposition: attachment;filename='.$filename);
+header('Content-Type: text/csv; charset=utf-8');  
+header('Content-Disposition: attachment; filename=data.csv');  
+$output = fopen("php://output", "w"); 
   
 //Suppose you have stored data in a table called "users", where the 5 fields are user_id, first_name, last_name, age and email.
 if($cnstr=='N')
 {
-
-  echo "APPLICATION NUMBER\tNAME\tBIRTH CATEGORY\tDISABLE STATUS\tPERCENTAGE OF MARKS$1\tPERCENTAGE OF GP$1\tVALID UPTO\tGATE SCORE\tGATE AIR\tPROGRAM TYPE$1\tPROGRAM TYPE$2\n"; // prints header line with field names
-
+ fputcsv($output,array('APPLICATION NUMBER','NAME','BIRTH CATEGORY','DISABLE STATUS','PERCENTAGE OF MARKS$1','PERCENTAGE OF GP$1','VALID UPTO','GATE SCORE','GATE AIR','PROGRAM TYPE$1','PROGRAM TYPE$2'));
     while($row = mysqli_fetch_array($result,MYSQLI_ASSOC)) 
     {
-      //echo $row['user_id']."\t". $row['first_name']."\t". $row['last_name']."\t". $row['age']."\t". $row['email']."\n";
-       echo $row['APPLICATION NUMBER']. "\t" . $row['NAME']. "\t" . $row['BIRTH CATEGORY'] . "\t" . $row['DISABLE STATUS'] . "\t" . $row['PERCENTAGE OF MARKS$1'] . "\t" . $row['PERCENTAGE OF GP$1'] . "\t" . $row['VALID UPTO'] . "\t" . $row['GATE SCORE'] . "\t" . $row['GATE AIR'] . "\t" . $row['PROGRAM TYPE$1'] . "\t" . $row['PROGRAM TYPE$2'] . "\n"; // prints each record with five fields in a row
+   fputcsv($output, array($row['APPLICATION NUMBER'],$row['NAME'], $row['BIRTH CATEGORY'] , $row['DISABLE STATUS'],$row['PERCENTAGE OF MARKS$1'] , $row['PERCENTAGE OF GP$1'] , $row['VALID UPTO'],$row['GATE SCORE'],$row['GATE AIR'], $row['PROGRAM TYPE$1'],$row['PROGRAM TYPE$2'])); 
     }
 }
 else
@@ -140,37 +141,45 @@ else
   $selcolnames = explode(",", $cnstr);
   if($selcolnames[0]=='0')
   {
+    $arrayName = array();
     foreach ($coln as $id) {
-      echo $id."\t";
+      array_push($arrayName,$id);
     }
-    echo "\n";
+    fputcsv($output, $arrayName);
     while($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
     {
+      $arrayName = array();
       foreach ($coln as $id) {
-          echo "\"". $row[$id]. "\"\t";
+          array_push($arrayName,$row[$id]);
+
        }
-      echo "\n";
+       fputcsv($output, $arrayName);
     }
   }
    else
    {
+    $arrayName = array();
       foreach ($selcolnames as $id) 
       {
         $var=$coln[$id-1];
         echo $var."\t";
+        array_push($arrayName,$var);
+
       }
-      echo "\n";
+      fputcsv($output, $arrayName);
       while($row=mysqli_fetch_array($result,MYSQLI_ASSOC))
       {
+        $arrayName = array();
         foreach ($selcolnames as $id) 
         {
             $var=$coln[$id-1];
-            echo "\"". $row[$var]. "\"\t";
+            array_push($arrayName,$row[$var]);
          }
-        echo "\n";
+        fputcsv($output, $arrayName);
       }
    }
 
 }
+fclose($output);
 
 ?>

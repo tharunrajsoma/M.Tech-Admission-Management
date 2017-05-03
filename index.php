@@ -74,7 +74,7 @@ mysql_select_db("testdb");
        session_start();
       $_SESSION['loggedin'] = true;
       $_SESSION['username'] = $myusername;
-         header("location: welcome.php");
+         header("location: home.php");
          exit();
       }else {
         echo "<script language=\"JavaScript\">\n";
@@ -197,10 +197,11 @@ mysql_select_db("testdb");
           <p class="forgot"><a href="/pwdrecovery.php">Forgot Password?</a></p>
           
           <button class="button button-block" name ="btn-login"/>Log In</button>
-         
+       <!--  
           	  <h2></h2>
           	  <h1>or Log In using</h1>
                     <div class="g-signin2" data-onsuccess="onSignIn" align="center"></div>
+                  -->
          <script>
           function onSignIn(googleUser) {
             // Useful data for your client-side scripts:
@@ -280,3 +281,4 @@ mysql_select_db("testdb");
     <script src="js/index.js"></script>
 
 </body>
+<h2 align="right ">Created by Tharun Raj, Rahul Kumar and Bhanu</h2>
